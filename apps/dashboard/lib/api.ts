@@ -1,10 +1,11 @@
 import type { Account, Run, Post, StatsData, PersonaProfile } from './store';
 
-// In production NEXT_PUBLIC_API_URL is baked in at build time (Railway build arg).
-// Locally it falls back to the Next.js rewrite proxy (empty string → /api/*).
+// Browser always routes through the Next.js Route Handler proxy at /api/*.
+// Server-side (SSR) uses API_URL directly (runtime env var, never reaches browser bundle).
 const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ||
-  (typeof window !== 'undefined' ? '' : `http://localhost:${process.env.PORT_API || 3001}`);
+  typeof window !== 'undefined'
+    ? ''
+    : (process.env.API_URL || `http://localhost:${process.env.PORT_API || 3001}`);
 
 async function req<T>(url: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${BASE_URL}${url}`, {
