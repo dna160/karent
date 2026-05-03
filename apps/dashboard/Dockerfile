@@ -1,14 +1,14 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
-# Build context is repo root; reference dashboard package.json explicitly
-COPY apps/dashboard/package.json ./
+# rootDirectory is set to /apps/dashboard in Railway, so build context is already scoped
+COPY package.json ./
 RUN npm install
 
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-COPY apps/dashboard/ .
+COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runner
