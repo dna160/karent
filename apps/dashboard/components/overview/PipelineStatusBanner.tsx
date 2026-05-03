@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { api } from '@/lib/api';
+import { api, subscribeToRunLogs, type LogEvent } from '@/lib/api';
 import type { Run } from '@/lib/store';
 
 const AGENT_LABELS: Record<string, { label: string; step: number }> = {
@@ -32,8 +32,7 @@ export function PipelineStatusBanner({ slug }: Props) {
   // Subscribe to SSE log for latest line
   useEffect(() => {
     if (!activeRun) return;
-    const { subscribeToRunLogs } = require('@/lib/api');
-    const unsub = subscribeToRunLogs(slug, activeRun.id, (e) => setLastLog(e.message));
+    const unsub = subscribeToRunLogs(slug, activeRun.id, (e: LogEvent) => setLastLog(e.message));
     return unsub;
   }, [activeRun?.id, slug]);
 
