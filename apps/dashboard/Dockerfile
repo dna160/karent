@@ -17,6 +17,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
+# public/ may be empty but must exist for Next.js
 COPY --from=builder /app/public ./public
 EXPOSE 3000
 CMD ["sh", "-c", "npm run start -- -p ${PORT:-3000}"]
