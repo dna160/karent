@@ -18,6 +18,7 @@ model Influencer {
   slug             String           @unique @db.VarChar(100)
   display_name     String           @db.VarChar(255)
   persona_profile  Json
+  base_image_paths String[]         @default([])
   avatar_url       String?
   instagram_handle String?          @db.VarChar(100)
   status           InfluencerStatus @default(active)

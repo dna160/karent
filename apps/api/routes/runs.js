@@ -9,6 +9,7 @@ const router = express.Router({ mergeParams: true });
 const { prisma } = require('../db/index');
 const { tenantQuery, tenantExecute, schemaName } = require('../db/tenant');
 const { getPipelineQueue } = require('../queue/index');
+const { ACCOUNTS_DIR } = require('../lib/config-loader');
 
 // Dynamic multer storage: puts files in os.tmpdir()/karent/{run_id}/references/
 const storage = multer.diskStorage({
@@ -37,9 +38,6 @@ router.post('/:slug/run', upload.array('reference_images', 5), async (req, res) 
   const { slug } = req.params;
   const { post_type, caption_hint, drive_pose_folder_id, persona_profile } = req.body;
 
-  if (!req.files || req.files.length === 0) {
-    return res.status(400).json({ success: false, error: 'At least one reference image is required' });
-  }
   if (!post_type) {
     return res.status(400).json({ success: false, error: 'post_type is required (feed | story | both)' });
   }
@@ -48,8 +46,22 @@ router.post('/:slug/run', upload.array('reference_images', 5), async (req, res) 
     const influencer = await prisma.influencer.findUnique({ where: { slug } });
     if (!influencer) return res.status(404).json({ success: false, error: 'Account not found' });
 
+    // Reference images: use uploaded files, or fall back to account base images
+    let reference_image_paths = req.files ? req.files.map((f) => f.path) : [];
+
+    if (reference_image_paths.length === 0) {
+      // Fall back to base images stored at account creation
+      const storedPaths = (influencer.base_image_paths || []).filter((p) => fs.existsSync(p));
+      if (storedPaths.length === 0) {
+        return res.status(400).json({
+          success: false,
+          error: 'No reference images provided and no base images found for this account. Upload base images first.',
+        });
+      }
+      reference_image_paths = storedPaths;
+    }
+
     const run_id = req.runId || uuidv4();
-    const reference_image_paths = req.files.map((f) => f.path);
 
     let parsedPersona = influencer.persona_profile;
     if (persona_profile) {

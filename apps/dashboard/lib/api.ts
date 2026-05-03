@@ -24,16 +24,25 @@ export const api = {
 
     get: (slug: string) => req<Account>(`/api/accounts/${slug}`),
 
-    create: (body: {
+    create: (fields: {
       slug: string;
       display_name: string;
       instagram_handle?: string;
       persona_profile?: PersonaProfile;
-    }) =>
-      req<Account>('/api/accounts', {
-        method: 'POST',
-        body: JSON.stringify(body),
-      }),
+    }, baseImages: File[]) => {
+      const fd = new FormData();
+      fd.append('slug', fields.slug);
+      fd.append('display_name', fields.display_name);
+      if (fields.instagram_handle) fd.append('instagram_handle', fields.instagram_handle);
+      if (fields.persona_profile) fd.append('persona_profile', JSON.stringify(fields.persona_profile));
+      baseImages.forEach((f) => fd.append('base_images', f));
+      return fetch(`${BASE_URL}/api/accounts`, { method: 'POST', body: fd })
+        .then(async (res) => {
+          const json = await res.json();
+          if (!json.success) throw new Error(json.error || 'API request failed');
+          return json.data as Account;
+        });
+    },
 
     update: (slug: string, updates: Partial<Account>) =>
       req<Account>(`/api/accounts/${slug}`, {

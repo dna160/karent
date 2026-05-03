@@ -12,6 +12,8 @@ export interface Account {
   slug: string;
   display_name: string;
   persona_profile: PersonaProfile;
+  base_image_paths?: string[];
+  base_image_urls?: string[];
   avatar_url?: string | null;
   instagram_handle?: string | null;
   status: 'active' | 'paused' | 'archived';

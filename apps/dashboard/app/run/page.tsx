@@ -22,7 +22,9 @@ export default function RunPipelinePage() {
   const [activeRunId, setActiveRunId] = useState<string | null>(null);
   const [error, setError] = useState('');
 
-  const canRun = refImages.length > 0 && !running;
+  const hasBaseImages = (activeAccount?.base_image_urls?.length ?? 0) > 0;
+  // Can run if: base images exist (use those) OR user uploaded ref images for this run
+  const canRun = (hasBaseImages || refImages.length > 0) && !running;
 
   async function handleRun() {
     if (!activeAccount || !canRun) return;
@@ -67,11 +69,47 @@ export default function RunPipelinePage() {
 
       {/* Form */}
       <div className="card p-5 space-y-5">
-        {/* Reference images */}
+
+        {/* Base images status */}
+        {hasBaseImages ? (
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-300">
+                Character Base
+                <span className="ml-2 text-xs font-normal text-indigo-400 bg-indigo-600/10 border border-indigo-500/20 px-2 py-0.5 rounded-full">
+                  {activeAccount!.base_image_urls!.length} photos stored
+                </span>
+              </label>
+            </div>
+            <div className="flex gap-2 flex-wrap">
+              {activeAccount!.base_image_urls!.slice(0, 6).map((url, i) => (
+                <div key={i} className="w-12 h-12 rounded-lg overflow-hidden border border-bg-border bg-bg-base flex-shrink-0">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={url} alt="" className="w-full h-full object-cover" />
+                </div>
+              ))}
+              {(activeAccount!.base_image_urls!.length > 6) && (
+                <div className="w-12 h-12 rounded-lg border border-bg-border bg-bg-base flex items-center justify-center text-xs text-gray-500">
+                  +{activeAccount!.base_image_urls!.length - 6}
+                </div>
+              )}
+            </div>
+            <p className="text-xs text-gray-600 mt-1.5">These base images will be used automatically. Upload extras below for this run only (optional).</p>
+          </div>
+        ) : (
+          <div className="text-xs text-yellow-500/80 bg-yellow-500/5 border border-yellow-500/20 rounded-lg p-3">
+            ⚠ No base images found for this account. Go to Settings to upload base images, or upload reference images below.
+          </div>
+        )}
+
+        {/* Per-run reference images (optional if base exists) */}
         <div>
           <label className="block text-sm font-medium text-gray-300 mb-2">
-            Reference Images <span className="text-red-400">*</span>
-            <span className="text-gray-600 font-normal ml-1">Face & style references — max 5</span>
+            {hasBaseImages ? (
+              <>Extra References <span className="text-gray-600 font-normal">(optional — max 5)</span></>
+            ) : (
+              <>Reference Images <span className="text-red-400">*</span> <span className="text-gray-600 font-normal">— max 5</span></>
+            )}
           </label>
           <ReferenceImageUploader files={refImages} onChange={setRefImages} />
         </div>
