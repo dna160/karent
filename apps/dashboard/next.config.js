@@ -7,14 +7,6 @@ const nextConfig = {
       { protocol: 'https', hostname: 'www.instagram.com' },
     ],
   },
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: `${process.env.NEXT_PUBLIC_API_URL || `http://localhost:${process.env.PORT_API || 3001}`}/api/:path*`,
-      },
-    ];
-  },
 };
 
 module.exports = nextConfig;
