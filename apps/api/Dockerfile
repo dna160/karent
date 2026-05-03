@@ -10,6 +10,7 @@ COPY apps/api/prisma/ ./prisma/
 
 RUN npm install --omit=dev
 RUN node node_modules/prisma/build/index.js generate --schema=./prisma/schema.prisma
+RUN mkdir -p /app/config/accounts
 
 COPY apps/api/ .
 
