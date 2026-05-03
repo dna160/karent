@@ -1,4 +1,7 @@
-require('dotenv').config({ path: require('path').join(__dirname, '../../.env') });
+// Load .env from project root (local dev) or fall back to process env (Railway/production)
+const path = require('path');
+require('dotenv').config({ path: path.join(__dirname, '../../.env') });
+require('dotenv').config({ path: path.join(__dirname, '.env') }); // fallback
 
 const express = require('express');
 const cors = require('cors');
