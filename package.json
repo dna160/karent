@@ -8,6 +8,10 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=apps/api\" \"npm run dev --workspace=apps/dashboard\"",
+    "build": "npm run build --workspace=apps/dashboard",
+    "start": "npm run start --workspace=apps/dashboard",
+    "build:api": "echo 'API has no build step'",
+    "start:api": "npm run start --workspace=apps/api",
     "db:migrate": "npx prisma migrate dev --schema=prisma/schema.prisma",
     "db:generate": "npx prisma generate --schema=prisma/schema.prisma",
     "db:studio": "npx prisma studio --schema=prisma/schema.prisma"

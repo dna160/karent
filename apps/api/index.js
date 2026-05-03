@@ -14,10 +14,14 @@ const { startPipelineProcessors } = require('./queue/pipeline');
 const { prisma } = require('./db/index');
 
 const app = express();
-const PORT = process.env.PORT_API || 3001;
+const PORT = process.env.PORT || process.env.PORT_API || 3001;
 
 // ── Middleware ─────────────────────────────────────────────────────────────────
-app.use(cors({ origin: `http://localhost:${process.env.PORT_DASHBOARD || 3000}` }));
+app.use(cors({
+  origin: process.env.DASHBOARD_URL
+    ? [process.env.DASHBOARD_URL, `http://localhost:${process.env.PORT_DASHBOARD || 3000}`]
+    : true, // allow all origins in dev / when DASHBOARD_URL not set
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
