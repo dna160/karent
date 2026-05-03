@@ -1,13 +1,13 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY apps/dashboard/package.json ./
+COPY package.json ./
 RUN npm install
 
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-COPY apps/dashboard/ .
+COPY . .
 RUN npm run build
 
 FROM node:20-alpine AS runner
@@ -17,7 +17,6 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./package.json
-# public/ may be empty but must exist for Next.js
 COPY --from=builder /app/public ./public
 EXPOSE 3000
 CMD ["sh", "-c", "npm run start -- -p ${PORT:-3000}"]

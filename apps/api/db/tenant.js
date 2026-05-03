@@ -24,10 +24,11 @@ async function withTenantSchema(influencerId, callback) {
  */
 async function createTenantSchema(influencerId) {
   const schema = schemaName(influencerId);
-  const sqlTemplate = fs.readFileSync(
-    path.join(process.cwd(), 'prisma', 'tenant-schema.sql'),
-    'utf8'
-  );
+  // Check local apps/api/prisma/ first (Railway), then fall back to repo root prisma/
+  const localSql  = path.join(__dirname, '..', 'prisma', 'tenant-schema.sql');
+  const rootSql   = path.join(process.cwd(), 'prisma', 'tenant-schema.sql');
+  const sqlPath   = fs.existsSync(localSql) ? localSql : rootSql;
+  const sqlTemplate = fs.readFileSync(sqlPath, 'utf8');
   const sql = sqlTemplate.replace(/\{schema_name\}/g, schema);
 
   // Split on semicolons, execute each non-empty statement

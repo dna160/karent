@@ -1,16 +1,16 @@
 FROM node:20-alpine
 WORKDIR /app
 
-# Copy package.json and prisma schema first (for layer caching)
-COPY apps/api/package.json ./
+# Copy package.json and prisma files (self-contained in apps/api/)
+COPY package.json ./
 COPY prisma/ ./prisma/
 
-# Install deps and generate Prisma client
+# Install deps and generate Prisma client from local schema
 RUN npm install --omit=dev
 RUN npx prisma generate --schema=./prisma/schema.prisma
 
 # Copy the rest of the API source
-COPY apps/api/ .
+COPY . .
 
 EXPOSE 3001
 CMD ["node", "index.js"]

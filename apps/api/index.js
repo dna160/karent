@@ -1,11 +1,10 @@
-// Load .env from project root (local dev) or fall back to process env (Railway/production)
+// Load .env from project root (local dev) — Railway injects env vars directly
 const path = require('path');
 require('dotenv').config({ path: path.join(__dirname, '../../.env') });
-require('dotenv').config({ path: path.join(__dirname, '.env') }); // fallback
+require('dotenv').config({ path: path.join(__dirname, '.env') });
 
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
 
 const accountsRouter = require('./routes/accounts');
 const runsRouter = require('./routes/runs');
