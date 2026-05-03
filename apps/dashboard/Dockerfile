@@ -1,13 +1,14 @@
 FROM node:20-alpine AS deps
 WORKDIR /app
-COPY package.json ./
+# Build context is repo root; reference dashboard package.json explicitly
+COPY apps/dashboard/package.json ./
 RUN npm install
 
 FROM node:20-alpine AS builder
 WORKDIR /app
 ENV NEXT_TELEMETRY_DISABLED=1
 COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY apps/dashboard/ .
 RUN npm run build
 
 FROM node:20-alpine AS runner
