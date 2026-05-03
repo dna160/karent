@@ -7,7 +7,7 @@ COPY prisma/ ./prisma/
 
 # Install deps and generate Prisma client from local schema
 RUN npm install --omit=dev
-RUN npx prisma generate --schema=./prisma/schema.prisma
+RUN ./node_modules/.bin/prisma generate --schema=./prisma/schema.prisma
 
 # Copy the rest of the API source
 COPY . .
